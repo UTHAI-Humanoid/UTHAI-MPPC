@@ -3,17 +3,13 @@
   <name>uthai_mppc</name>
   <version>0.0.1</version>
   <description>ROS packages for the uthai_opc (meta package)</description>
-  <!-- One license tag required, multiple allowed, one license per tag -->
-  <!-- Commonly used license strings: -->
-  <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
-  <license>TODO</license>
+  <license>BSD</license>
   <maintainer email="sweilz.w@gmail.com">sweilz</maintainer>
-  <author email="....@......com">some one</author>
-  <url type="repository">https://github.com/UTHAI-Humanoid/UTHAI-OPC</url>
+  <!-- <author email="....@......com">some one</author> -->
+  <url type="repository">https://github.com/UTHAI-Humanoid/UTHAI-MPPC</url>
   <buildtool_depend>catkin</buildtool_depend>
-  <!-- The export tag contains other, unspecified, tags -->
+  <!-- <run_depend>uthai,,,,</run_depend> -->
   <export>
-    <!-- Other tools can request additional information be placed here -->
     <metapackage/>
   </export>
 </package>
