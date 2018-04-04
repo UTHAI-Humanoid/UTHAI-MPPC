@@ -18,8 +18,8 @@ if __name__ == "__main__":
         except KeyboardInterrupt:
             break
         except SerialException:
-            # rospy.sleep(0.1)
+            rospy.sleep(0.1)
             continue
         except OSError:
-            # rospy.sleep(0.1)
+            rospy.sleep(0.1)
             continue
