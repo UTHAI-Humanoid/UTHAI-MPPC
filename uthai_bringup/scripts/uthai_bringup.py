@@ -3,12 +3,12 @@ import rospy
 import actionlib
 
 from dynamixel_controllers.srv import SetSpeed
-from std_msgs.msg import Float64, Header
+from std_msgs.msg import Float64, Header, Bool, Empty
 from trajectory_msgs.msg import JointTrajectoryPoint, JointTrajectory
 from sensor_msgs.msg import JointState
 from control_msgs.msg import FollowJointTrajectoryFeedback
 from control_msgs.msg import JointTrajectoryAction, JointTrajectoryGoal, FollowJointTrajectoryAction, FollowJointTrajectoryGoal
-
+from dynamixel_controllers.srv import TorqueEnable
 
 class Uthai(object):
     def __init__(self):
@@ -28,13 +28,46 @@ class Uthai(object):
 
         self.joint_state = JointState()
         self.joint_command_sub = rospy.Subscriber('/uthai/joint_command',JointTrajectory, self.joint_command_callback)
-        
+
+        self.torque_enable = rospy.Subscriber('/uthai/torque_enable', Bool, self.torque_enable_callback)
+        # self.get_position = rospy.Subscriber('/uthai/get_position', Empty, self.get_position_callback)
         ## Action client ##
         self.jta = actionlib.SimpleActionClient(
             '/uthai_controller/follow_joint_trajectory', FollowJointTrajectoryAction)
         rospy.loginfo("Waiting fot joint trajectory action")
         self.jta.wait_for_server()
         rospy.loginfo("Found joint trajectory action!")
+
+      
+        self.torque_enable_services = [
+            rospy.ServiceProxy('r_hip_yaw_controller/torque_enable', TorqueEnable),
+            rospy.ServiceProxy('r_hip_roll_controller/torque_enable', TorqueEnable),
+            rospy.ServiceProxy('r_hip_pitch_controller/torque_enable', TorqueEnable),
+            rospy.ServiceProxy('r_knee_pitch_controller/torque_enable', TorqueEnable),
+            rospy.ServiceProxy('r_ankle_pitch_controller/torque_enable', TorqueEnable),
+            rospy.ServiceProxy('r_ankle_roll_controller/torque_enable', TorqueEnable),
+            rospy.ServiceProxy('l_hip_yaw_controller/torque_enable', TorqueEnable),
+            rospy.ServiceProxy('l_hip_roll_controller/torque_enable', TorqueEnable),
+            rospy.ServiceProxy('l_hip_pitch_controller/torque_enable', TorqueEnable),
+            rospy.ServiceProxy('l_knee_pitch_controller/torque_enable', TorqueEnable),
+            rospy.ServiceProxy('l_ankle_pitch_controller/torque_enable', TorqueEnable),
+            rospy.ServiceProxy('l_ankle_roll_controller/torque_enable', TorqueEnable)
+ 
+            # rospy.ServiceProxy('r_knee_pitch_controller/torque_enable', TorqueEnable),
+            # rospy.ServiceProxy('l_knee_pitch_controller/torque_enable', TorqueEnable),
+        ]
+
+    
+    # def get_position_callback(self, msg):
+    #     rospy.loginfo(self.joint_state.position)
+
+    def torque_enable_callback(self, msg):
+        rospy.loginfo(msg.data)
+        for torque_enable_service in self.torque_enable_services:
+            torque_enable_service(msg.data)
+
+
+
 
     def joint_command_callback(self, msg):
         goal = FollowJointTrajectoryGoal()
@@ -75,17 +108,36 @@ def main():
     uthai = Uthai()
     # uthai.joint_command_enable()
     uthai.joints_move([0.0]*12, 5.0)
+
+    # rospy.sleep(3)
+
+
+    
+
     # while True:
-    #     uthai.joints_move([0,0,-0.62832,1.2566,-0.62832,0,0,0,-0.62832,1.2566,-0.62832,0],0.5)
-    #     rospy.sleep(2)
-    #     uthai.joints_move([0.0]*12, 0.5)
-    #     rospy.sleep(2)
+    for i in range(3):
+        # right
+        uthai.joints_move( [0, 0.06, 0, 0, 0, -0.06, 0, 0.06, 0, 0, 0, -0.06], 3.0)
+        # left
+        uthai.joints_move( [0, -0.06, 0, 0, 0, 0.06, 0, -0.06, 0, 0, 0, 0.06], 3.0)
+        # left2
+        # uthai.joints_move( [-0.07163536881347156, -0.12509459927128616, -0.04276738436625168, -0.002138369218312584, 0.08125803029587819, 0.10798764552478549, -0.019245322964813256, -0.019245322964813256, 0.05132086123950201, 0.00534592304578146, -0.01603776913734438, 0.09836498404237887],5.0)
+        # move to right
+        # uthai.joints_move( [-0.07377373803178415, 0.07270455342262785, 0.07805047646840932, -0.00534592304578146, -0.05559759967612718, -0.052390045848658306, -0.019245322964813256, 0.19459159886644514, 0.1593085067642875, 0.00534592304578146, -0.1315097069262239, -0.07591210725009673], 5.0)
+        # rospy.sleep(1)
+        # uthai.joints_move([0.0]*12, 1.0)
+        # rospy.sleep(1)
+        # rospy.sleep(1)
+        # uthai.joints_move([0.0]*12, 1.0)
+        # rospy.sleep(1)
+        # rospy.sleep(2)
     # rospy.sleep(2.0)
     # with open('MoveCoML.csv', 'r') as csvfile:
     #     spamreader = csvfile.read().split('\n')
     #     for row in spamreader:
     #         q_set = map(float, row.split(','))
     #         uthai.joint_move(q_set, 0.1)
+    uthai.joints_move([0.0]*12, 5.0)
 
     rospy.spin()
 
